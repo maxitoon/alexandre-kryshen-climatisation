@@ -1,0 +1,294 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+import QuoteForm from '../../components/QuoteForm.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import apartmentImage from '../../assets/coastal-apartment-context.png';
+import corridorImage from '../../assets/coastal-corridor-relief.png';
+import heroImage from '../../assets/hero-riviera-interior.png';
+import hospitalityImage from '../../assets/hospitality-context.png';
+import installationImage from '../../assets/installation-planning-detail.png';
+import villaImage from '../../assets/seasonal-villa-context.png';
+import { content, ui } from '../../lib/content';
+import {
+  adjacentLocationKeys,
+  locationPageKeys,
+  pageKeyFromPath,
+  routeFor,
+  staticRoutes,
+  type LocationPageKey,
+  type PageKey,
+} from '../../lib/routes';
+import { sharedCopy } from '../../lib/shared-content';
+import { isLocale, type Locale } from '../../lib/site';
+
+export function getStaticPaths() {
+  return staticRoutes().map((route) => ({
+    params: {
+      locale: route.locale,
+      path: route.path || undefined,
+    },
+    props: {
+      pageKey: route.key,
+    },
+  }));
+}
+
+interface Props {
+  pageKey: PageKey;
+}
+
+const localeParam = Astro.params.locale;
+
+if (!isLocale(localeParam)) {
+  throw new Error(`Unsupported locale: ${localeParam}`);
+}
+
+const locale: Locale = localeParam;
+const { pageKey: pageKeyProp } = Astro.props as Props;
+const pageKey = pageKeyProp ?? pageKeyFromPath(locale, Astro.params.path);
+
+if (!pageKey) {
+  throw new Error(`Unknown page path: ${Astro.params.path}`);
+}
+
+const page = content[locale][pageKey];
+const copy = ui[locale];
+const shared = sharedCopy[locale];
+const isLocation = locationPageKeys.includes(pageKey as LocationPageKey);
+const adjacentLocations = isLocation ? adjacentLocationKeys(pageKey as LocationPageKey) : [];
+const imageByPage: Partial<Record<PageKey, ImageMetadata>> = {
+  services: hospitalityImage,
+  installation: installationImage,
+  areas: corridorImage,
+  monaco: apartmentImage,
+  menton: apartmentImage,
+  nice: apartmentImage,
+  antibes: apartmentImage,
+  cannes: hospitalityImage,
+  frejus: hospitalityImage,
+  sainteMaxime: villaImage,
+  saintTropez: villaImage,
+};
+const imageAltByPage: Partial<Record<PageKey, string>> = {
+  services: shared.assetAlts.hospitality,
+  installation: shared.assetAlts.installation,
+  areas: shared.assetAlts.corridor,
+  monaco: shared.assetAlts.apartment,
+  menton: shared.assetAlts.apartment,
+  nice: shared.assetAlts.apartment,
+  antibes: shared.assetAlts.apartment,
+  cannes: shared.assetAlts.hospitality,
+  frejus: shared.assetAlts.hospitality,
+  sainteMaxime: shared.assetAlts.villa,
+  saintTropez: shared.assetAlts.villa,
+};
+const editorialImage = imageByPage[pageKey];
+const isHome = pageKey === 'home';
+const isQuote = pageKey === 'quote';
+---
+
+<BaseLayout
+  {locale}
+  {pageKey}
+  title={page.metaTitle}
+  description={page.metaDescription}
+  eyebrow={page.eyebrow}
+>
+  <main id="main">
+    {
+      isHome ? (
+        <>
+          <section class="hero">
+            <div class="hero-image" aria-hidden="true">
+              <Image
+                src={heroImage}
+                alt=""
+                widths={[640, 960, 1400, 1800]}
+                sizes="(max-width: 760px) 100vw, 58vw"
+                format="avif"
+                loading="eager"
+                fetchpriority="high"
+              />
+              <div class="hero-temperature">
+                <span>06</span>
+                <i />
+                <span>83</span>
+              </div>
+            </div>
+            <div class="hero-copy">
+              <p class="eyebrow">{page.eyebrow}</p>
+              <h1>{page.title}</h1>
+              <p class="lede">{page.lede}</p>
+              <div class="hero-actions">
+                <a class="button-primary" href={routeFor(locale, 'quote')}>
+                  {copy.quoteAction}
+                  <span aria-hidden="true">↗</span>
+                </a>
+                <a class="button-text" href={routeFor(locale, 'areas')}>
+                  {copy.exploreAreas}
+                  <span aria-hidden="true">↓</span>
+                </a>
+              </div>
+            </div>
+            <div class="hero-index" aria-hidden="true">
+              <span>{shared.heroComfortLabel}</span>
+              <strong>01</strong>
+            </div>
+          </section>
+
+          <section class="statement-section" id="approach">
+            <div class="section-number">02</div>
+            <div>
+              <p class="eyebrow">{copy.navApproach}</p>
+              <h2>
+                {shared.approachHeadingBefore}
+                <>
+                  <br />
+                  <em>{shared.approachHeadingAccent}</em>
+                </>
+              </h2>
+            </div>
+            <p>{page.sections[0]?.body ?? page.lede}</p>
+          </section>
+
+          <section class="pathways">
+            <a class="pathway pathway-dark" href={routeFor(locale, 'installation')}>
+              <span>01 · {copy.navServices}</span>
+              <h2>{content[locale].installation.title}</h2>
+              <p>{content[locale].installation.lede}</p>
+              <i aria-hidden="true">↗</i>
+            </a>
+            <a class="pathway pathway-light" href={routeFor(locale, 'areas')}>
+              <span>02 · {copy.navAreas}</span>
+              <h2>{content[locale].areas.title}</h2>
+              <p>{content[locale].areas.lede}</p>
+              <i aria-hidden="true">↗</i>
+            </a>
+          </section>
+
+          <section class="corridor-strip">
+            <p class="eyebrow">{copy.corridorLabel}</p>
+            <div class="city-marquee" aria-label={copy.corridorLabel}>
+              {locationPageKeys.map((key) => (
+                <span>
+                  {shared.locationNames[key]}
+                  <i>·</i>
+                </span>
+              ))}
+            </div>
+          </section>
+
+          <QuoteForm {locale} />
+        </>
+      ) : (
+        <>
+          <section class="page-hero">
+            <div class="page-hero-index" aria-hidden="true">
+              {String(
+                ['services', 'installation'].includes(pageKey)
+                  ? 2
+                  : pageKey === 'areas' || isLocation
+                    ? 3
+                    : 4,
+              ).padStart(2, '0')}
+            </div>
+            <div class="page-hero-copy">
+              <p class="eyebrow">{page.eyebrow}</p>
+              <h1>{page.title}</h1>
+              <p class="lede">{page.lede}</p>
+            </div>
+            <div class="thermal-orbit" aria-hidden="true">
+              <>
+                <i />
+                <i />
+                <i />
+              </>
+            </div>
+          </section>
+
+          {editorialImage && (
+            <figure class="editorial-image">
+              <Image
+                src={editorialImage}
+                alt={imageAltByPage[pageKey] ?? ''}
+                widths={[640, 960, 1400, 1800]}
+                sizes="(max-width: 760px) 100vw, 86vw"
+                format="avif"
+                loading="lazy"
+              />
+            </figure>
+          )}
+
+          <section class="content-grid">
+            {page.sections.map((section, index) => (
+              <article>
+                <span>0{index + 1}</span>
+                <h2>{section.title}</h2>
+                <p>{section.body}</p>
+              </article>
+            ))}
+          </section>
+
+          {pageKey === 'services' && (
+            <section class="feature-link-section">
+              <p class="eyebrow">01 · {shared.installationLabel}</p>
+              <a href={routeFor(locale, 'installation')}>
+                <strong>{content[locale].installation.title}</strong>
+                <span aria-hidden="true">↗</span>
+              </a>
+            </section>
+          )}
+
+          {pageKey === 'areas' && (
+            <section class="area-index">
+              <p class="eyebrow">{copy.corridorLabel}</p>
+              <div>
+                {locationPageKeys.map((key, index) => (
+                  <a href={routeFor(locale, key)}>
+                    <span>{String(index + 1).padStart(2, '0')}</span>
+                    <strong>{shared.locationNames[key]}</strong>
+                    <i aria-hidden="true">↗</i>
+                  </a>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {isLocation && (
+            <section class="context-links">
+              <a href={routeFor(locale, 'installation')}>
+                {copy.navServices}
+                <span>↗</span>
+              </a>
+              <a href={routeFor(locale, 'areas')}>
+                {copy.adjacentAreas}
+                <span>↗</span>
+              </a>
+              {adjacentLocations.map((key) => (
+                <a href={routeFor(locale, key)}>
+                  {shared.locationNames[key]}
+                  <span>↗</span>
+                </a>
+              ))}
+            </section>
+          )}
+
+          {isQuote ? (
+            <QuoteForm {locale} />
+          ) : (
+            <section class="page-cta">
+              <p class="eyebrow">{page.ctaTitle}</p>
+              <h2>{page.ctaBody}</h2>
+              <a class="button-primary" href={routeFor(locale, 'quote')}>
+                {copy.quoteAction}
+                <span aria-hidden="true">↗</span>
+              </a>
+            </section>
+          )}
+        </>
+      )
+    }
+  </main>
+</BaseLayout>

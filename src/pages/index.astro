@@ -1,0 +1,39 @@
+---
+import '@fontsource-variable/literata/wght.css';
+import '@fontsource-variable/onest/wght.css';
+import '../styles/global.css';
+
+import { localeNames } from '../lib/content';
+import { routeFor } from '../lib/routes';
+import { locales } from '../lib/site';
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex,follow" />
+    <meta name="theme-color" content="#33424A" />
+    <title>Alexandre Kryshen · Côte d’Azur</title>
+  </head>
+  <body class="gateway-page">
+    <main>
+      <div class="gateway-mark" aria-hidden="true"><i></i><i></i><i></i></div>
+      <p class="eyebrow">Monaco — Saint-Tropez</p>
+      <h1>Le confort,<br /><em>dans votre langue.</em></h1>
+      <p>Choisissez votre langue · Choose your language · Scegli la lingua · Выберите язык</p>
+      <nav aria-label="Language">
+        {
+          locales.map((locale, index) => (
+            <a href={routeFor(locale, 'home')} lang={locale}>
+              <span>0{index + 1}</span>
+              <strong>{localeNames[locale]}</strong>
+              <i aria-hidden="true">↗</i>
+            </a>
+          ))
+        }
+      </nav>
+    </main>
+  </body>
+</html>

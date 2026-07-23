@@ -1,0 +1,52 @@
+---
+import { ui } from '../lib/content';
+import { locationPageKeys, routeFor } from '../lib/routes';
+import { sharedCopy } from '../lib/shared-content';
+import { siteConfig, type Locale } from '../lib/site';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = ui[locale];
+const shared = sharedCopy[locale];
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="footer-horizon" aria-hidden="true">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="footer-grid">
+    <div class="footer-intro">
+      <p class="eyebrow">{copy.corridorLabel}</p>
+      <p class="footer-statement">{shared.footerStatement[0]}<br />{shared.footerStatement[1]}</p>
+    </div>
+    <nav aria-label={shared.footerNavLabel}>
+      <a href={routeFor(locale, 'services')}>{copy.navServices}</a>
+      <a href={routeFor(locale, 'installation')}>{shared.installationLabel}</a>
+      <a href={routeFor(locale, 'areas')}>{copy.navAreas}</a>
+      {
+        locationPageKeys.map((key) => (
+          <a href={routeFor(locale, key)}>{shared.locationNames[key]}</a>
+        ))
+      }
+    </nav>
+    <nav aria-label={shared.legalNavLabel}>
+      <a href={routeFor(locale, 'quote')}>{copy.navQuote}</a>
+      <a href={routeFor(locale, 'legal')}>{shared.legalLabel}</a>
+      <a href={routeFor(locale, 'privacy')}>{shared.privacyLabel}</a>
+    </nav>
+    <div class="footer-identity">
+      <p>{copy.legalIdentity}</p>
+      <strong>{siteConfig.legalName}</strong>
+      <span>{siteConfig.legalForm} · {siteConfig.baseLocality}</span>
+      <span>SIRET {siteConfig.siret}</span>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© {year} {siteConfig.publicName}</span>
+    <span>{copy.corridorLabel}</span>
+  </div>
+</footer>

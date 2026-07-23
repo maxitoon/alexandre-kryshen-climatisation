@@ -1,0 +1,84 @@
+---
+import { localeNames, ui } from '../lib/content';
+import { alternateRoutes, routeFor, type PageKey } from '../lib/routes';
+import { sharedCopy } from '../lib/shared-content';
+import { phoneHref, siteConfig, whatsappHref, type Locale } from '../lib/site';
+
+interface Props {
+  locale: Locale;
+  pageKey: PageKey;
+}
+
+const { locale, pageKey } = Astro.props;
+const copy = ui[locale];
+const shared = sharedCopy[locale];
+const home = routeFor(locale, 'home');
+---
+
+<a class="skip-link" href="#main">{copy.skip}</a>
+<header class="site-header">
+  <a class="wordmark" href={home} aria-label={`${siteConfig.publicName} — ${copy.breadcrumbHome}`}>
+    <span class="wordmark-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span>
+      <strong>Alexandre</strong>
+      <small>Kryshen · Côte d’Azur</small>
+    </span>
+  </a>
+
+  <details class="nav-shell">
+    <summary>
+      <span class="menu-open">{copy.menu}</span>
+      <span class="menu-close">{copy.close}</span>
+      <span class="menu-lines" aria-hidden="true"></span>
+    </summary>
+    <nav aria-label={shared.primaryNavLabel}>
+      <a href={routeFor(locale, 'services')}>{copy.navServices}</a>
+      <a href={routeFor(locale, 'areas')}>{copy.navAreas}</a>
+      <a href={`${home}#approach`}>{copy.navApproach}</a>
+      <a class="nav-cta" href={routeFor(locale, 'quote')}>{copy.navQuote}</a>
+    </nav>
+  </details>
+
+  <div class="header-actions">
+    <div class="contact-actions">
+      {
+        siteConfig.phone && (
+          <a class="header-action" href={phoneHref(siteConfig.phone)} data-contact-action="phone">
+            {copy.phoneAction}
+          </a>
+        )
+      }
+      {
+        siteConfig.whatsapp && (
+          <a
+            class="header-action"
+            href={whatsappHref(siteConfig.whatsapp)}
+            data-contact-action="whatsapp"
+            rel="noreferrer"
+          >
+            {copy.whatsappAction}
+          </a>
+        )
+      }
+    </div>
+    <details class="locale-switcher">
+      <summary aria-label={copy.language}>{locale.toUpperCase()}</summary>
+      <div class="locale-menu">
+        {
+          alternateRoutes(pageKey)
+            .filter((item) => item.locale !== 'x-default')
+            .map((item) => (
+              <a
+                href={item.path}
+                lang={item.locale}
+                aria-current={item.locale === locale ? 'page' : undefined}
+              >
+                <span>{item.locale.toUpperCase()}</span>
+                {localeNames[item.locale as Locale]}
+              </a>
+            ))
+        }
+      </div>
+    </details>
+  </div>
+</header>

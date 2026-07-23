@@ -1,0 +1,154 @@
+---
+import '@fontsource-variable/literata/wght.css';
+import '@fontsource-variable/onest/wght.css';
+import '../styles/global.css';
+
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import { ui } from '../lib/content';
+import { alternateRoutes, routeFor, type PageKey } from '../lib/routes';
+import { sharedCopy } from '../lib/shared-content';
+import { siteConfig, type Locale } from '../lib/site';
+
+interface Props {
+  locale: Locale;
+  pageKey: PageKey;
+  title: string;
+  description: string;
+  eyebrow: string;
+}
+
+const { locale, pageKey, title, description, eyebrow } = Astro.props;
+const shared = sharedCopy[locale];
+const copy = ui[locale];
+const ogLocales: Record<Locale, string> = {
+  fr: 'fr_FR',
+  en: 'en_GB',
+  it: 'it_IT',
+  ru: 'ru_RU',
+};
+const canonical = new URL(routeFor(locale, pageKey), siteConfig.siteUrl).href;
+const alternates = alternateRoutes(pageKey).map((item) => ({
+  hreflang: item.locale,
+  href: new URL(item.path, siteConfig.siteUrl).href,
+}));
+
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': `${siteConfig.siteUrl}/#organization`,
+  name: siteConfig.publicName,
+  legalName: siteConfig.legalName,
+  url: siteConfig.siteUrl,
+  identifier: {
+    '@type': 'PropertyValue',
+    propertyID: 'SIRET',
+    value: siteConfig.siret,
+  },
+  location: {
+    '@type': 'Place',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: siteConfig.baseLocality,
+      addressCountry: 'FR',
+    },
+  },
+  areaServed: [
+    'Monaco',
+    'Menton',
+    'Nice',
+    'Antibes',
+    'Cannes',
+    'Fréjus',
+    'Sainte-Maxime',
+    'Saint-Tropez',
+  ],
+  ...(siteConfig.phone ? { telephone: siteConfig.phone } : {}),
+};
+
+const breadcrumb =
+  pageKey === 'home'
+    ? null
+    : {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        inLanguage: locale,
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: copy.breadcrumbHome,
+            item: new URL(routeFor(locale, 'home'), siteConfig.siteUrl).href,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: eyebrow,
+            item: canonical,
+          },
+        ],
+      };
+
+const service =
+  pageKey === 'installation'
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Service',
+        name: title,
+        serviceType: shared.schemaServiceType,
+        inLanguage: locale,
+        provider: { '@id': `${siteConfig.siteUrl}/#organization` },
+        areaServed: organization.areaServed,
+        url: canonical,
+      }
+    : null;
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="theme-color" content="#33424A" />
+    <meta name="description" content={description} />
+    <meta name="robots" content={siteConfig.isPreview ? 'noindex,nofollow' : 'index,follow'} />
+    <link rel="canonical" href={canonical} />
+    {
+      alternates.map((alternate) => (
+        <link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />
+      ))
+    }
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={ogLocales[locale]} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta
+      property="og:image"
+      content={new URL(
+        `${siteConfig.basePath}/images/hero-riviera-interior.png`,
+        siteConfig.siteOrigin,
+      )}
+    />
+    <title>{title}</title>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(organization)} />
+    {
+      breadcrumb && (
+        <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumb)} />
+      )
+    }
+    {service && <script is:inline type="application/ld+json" set:html={JSON.stringify(service)} />}
+  </head>
+  <body>
+    <SiteHeader {locale} {pageKey} />
+    {
+      siteConfig.isPreview && (
+        <div class="preview-ribbon" role="note">
+          {shared.previewLabel}
+        </div>
+      )
+    }
+    <slot />
+    <SiteFooter {locale} />
+  </body>
+</html>

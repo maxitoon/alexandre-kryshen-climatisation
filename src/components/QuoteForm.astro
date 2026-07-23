@@ -1,0 +1,190 @@
+---
+import { ui } from '../lib/content';
+import { routeFor } from '../lib/routes';
+import { sharedCopy } from '../lib/shared-content';
+import { siteConfig, type Locale } from '../lib/site';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = ui[locale];
+const form = copy.form;
+const shared = sharedCopy[locale];
+const availablePreferredOptions = Object.entries(form.preferredOptions).filter(
+  ([value]) =>
+    value === 'email' ||
+    (value === 'phone' && Boolean(siteConfig.phone)) ||
+    (value === 'whatsapp' && Boolean(siteConfig.whatsapp)),
+);
+---
+
+<section class="quote-panel" aria-labelledby="quote-form-title">
+  <div class="quote-panel-intro">
+    <p class="eyebrow">{copy.quoteAction}</p>
+    <h2 id="quote-form-title">{form.title}</h2>
+    <p>{form.intro}</p>
+    {
+      !siteConfig.phone && !siteConfig.whatsapp && (
+        <p class="contact-pending">
+          <span aria-hidden="true" />
+          {copy.unavailableContact}
+        </p>
+      )
+    }
+  </div>
+
+  <form
+    class="quote-form"
+    data-quote-form
+    data-endpoint={siteConfig.quoteEndpoint}
+    data-label-submit={form.submit}
+    data-label-submitting={form.submitting}
+    data-label-success={form.success}
+    data-label-error={form.error}
+    data-form-available={String(siteConfig.quoteFormAvailable)}
+    novalidate
+  >
+    {
+      !siteConfig.quoteFormAvailable && (
+        <p class="form-unavailable field-wide" role="status">
+          {shared.formUnavailable}
+        </p>
+      )
+    }
+    <fieldset disabled={!siteConfig.quoteFormAvailable}>
+      <div class="field field-wide">
+        <label for="name">{form.name}</label>
+        <input id="name" name="name" autocomplete="name" required minlength="2" />
+      </div>
+      <div class="field">
+        <label for="email">{form.email}</label>
+        <input id="email" name="email" type="email" autocomplete="email" />
+      </div>
+      <div class="field">
+        <label for="phone">{form.phone}</label>
+        <input id="phone" name="phone" type="tel" autocomplete="tel" />
+      </div>
+      <div class="field field-wide">
+        <label for="locality">{form.locality}</label>
+        <input id="locality" name="locality" autocomplete="postal-code" required minlength="2" />
+      </div>
+      <div class="field">
+        <label for="propertyType">{form.propertyType}</label>
+        <select id="propertyType" name="propertyType" required>
+          {
+            Object.entries(form.propertyOptions).map(([value, label]) => (
+              <option value={value}>{label}</option>
+            ))
+          }
+        </select>
+      </div>
+      <div class="field">
+        <label for="timing">{form.timing}</label>
+        <select id="timing" name="timing" required>
+          {
+            Object.entries(form.timingOptions).map(([value, label]) => (
+              <option value={value}>{label}</option>
+            ))
+          }
+        </select>
+      </div>
+      <div class="field field-wide">
+        <label for="preferredContact">{form.preferredContact}</label>
+        <select id="preferredContact" name="preferredContact" required>
+          {
+            availablePreferredOptions.map(([value, label]) => (
+              <option value={value}>{label}</option>
+            ))
+          }
+        </select>
+      </div>
+      <div class="field field-wide">
+        <label for="message">{form.message}</label>
+        <textarea id="message" name="message" rows="5" required minlength="10"></textarea>
+      </div>
+      <div class="honeypot" aria-hidden="true">
+        <label for="website">{shared.honeypotLabel}</label>
+        <input id="website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+      <label class="consent field-wide">
+        <input name="consent" type="checkbox" value="yes" required />
+        <span>{form.consent} <a href={routeFor(locale, 'privacy')}>↗</a></span>
+      </label>
+      <div class="form-submit field-wide">
+        <button type="submit">
+          <span data-submit-label>{form.submit}</span>
+          <span aria-hidden="true">↗</span>
+        </button>
+        <p class="form-status" data-form-status role="status" aria-live="polite"></p>
+      </div>
+    </fieldset>
+  </form>
+</section>
+
+<script>
+  const formElement = document.querySelector('[data-quote-form]');
+
+  if (formElement instanceof HTMLFormElement && formElement.dataset.formAvailable === 'true') {
+    const status = formElement.querySelector<HTMLElement>('[data-form-status]');
+    const submit = formElement.querySelector('button[type="submit"]');
+    const submitLabel = formElement.querySelector('[data-submit-label]');
+    const preferred = formElement.querySelector<HTMLSelectElement>('[name="preferredContact"]');
+    const email = formElement.querySelector<HTMLInputElement>('[name="email"]');
+    const phone = formElement.querySelector<HTMLInputElement>('[name="phone"]');
+    const labels = {
+      submit: formElement.dataset.labelSubmit || '',
+      submitting: formElement.dataset.labelSubmitting || '',
+      success: formElement.dataset.labelSuccess || '',
+      error: formElement.dataset.labelError || '',
+    };
+
+    formElement.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      email?.setCustomValidity('');
+      phone?.setCustomValidity('');
+      if (preferred?.value === 'email' && email && !email.value.trim()) {
+        email.setCustomValidity(labels.error);
+      }
+      if (['phone', 'whatsapp'].includes(preferred?.value || '') && phone && !phone.value.trim()) {
+        phone.setCustomValidity(labels.error);
+      }
+
+      if (!formElement.reportValidity()) return;
+
+      const formData = new FormData(formElement);
+      const payload = Object.fromEntries(formData.entries());
+      const endpoint = formElement.dataset.endpoint || '/api/quote';
+
+      if (submit instanceof HTMLButtonElement) submit.disabled = true;
+      if (submitLabel) submitLabel.textContent = labels.submitting;
+      if (status) status.textContent = '';
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) throw new Error('Request failed');
+
+        formElement.reset();
+        if (status) {
+          status.textContent = labels.success;
+          status.dataset.state = 'success';
+        }
+      } catch {
+        if (status) {
+          status.textContent = labels.error;
+          status.dataset.state = 'error';
+        }
+      } finally {
+        if (submit instanceof HTMLButtonElement) submit.disabled = false;
+        if (submitLabel) submitLabel.textContent = labels.submit;
+      }
+    });
+  }
+</script>

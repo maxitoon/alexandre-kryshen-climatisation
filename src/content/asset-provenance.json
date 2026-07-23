@@ -1,0 +1,68 @@
+[
+  {
+    "id": "hero-riviera-interior",
+    "file": "src/assets/hero-riviera-interior.png and public/images/hero-riviera-interior.png",
+    "generationReference": "Built-in ImageGen · hero-riviera-interior",
+    "purpose": "Primary responsive hero for the production-grade vertical slice",
+    "dimensions": "1731x909",
+    "generationMode": "Built-in ImageGen",
+    "generatedAt": "2026-07-23",
+    "prompt": "Original panoramic architectural editorial photograph of a refined Mediterranean apartment interior on the French Riviera. Limestone, pale oak, linen and softly framed coastal light; architecture and atmosphere only; subtle integrated air distribution; generous negative space on the left; cool slate shadows, warm sand highlights and restrained terracotta; no people, logos, product labels, text, watermark, certificates, signage, brands, literal temperature icons or fake proof-of-work.",
+    "inspection": "Passed: landscape composition, usable left-side copy space, no people, logos, text, brands, watermarks or false project claims."
+  },
+  {
+    "id": "installation-planning-detail",
+    "file": "src/assets/installation-planning-detail.png",
+    "generationReference": "Built-in ImageGen · installation-planning-detail",
+    "purpose": "Installation-planning editorial image for the service and installation templates",
+    "dimensions": "1536x1024",
+    "generationMode": "Built-in ImageGen",
+    "generatedAt": "2026-07-23",
+    "prompt": "Premium Tempered Riviera editorial photograph: close architectural view of a calm Mediterranean interior in pale limestone and matte plaster, a discreet unbranded linear ceiling air diffuser and shadow-gap detail as focal point, blank cream sample, unmarked ruler and pencil, generous right-side negative space, Concept B palette, soft late-morning light, no people, text, logos, brands, watermarks, unsafe installation or false proof of completed work.",
+    "inspection": "Passed: plausible integrated diffuser, useful landscape crop and negative space; no people, logos, text, brands, watermarks or false project claims."
+  },
+  {
+    "id": "coastal-apartment-context",
+    "file": "src/assets/coastal-apartment-context.png",
+    "generationReference": "Built-in ImageGen · coastal-apartment-context",
+    "purpose": "Dense coastal apartment context for Monaco, Menton, Nice and Antibes",
+    "dimensions": "1536x1024",
+    "generationMode": "Built-in ImageGen",
+    "generatedAt": "2026-07-23",
+    "prompt": "Premium Tempered Riviera editorial photograph: view from an elegant compact upper-floor Mediterranean apartment toward a narrow balcony and layered coastal urban hillside, pale limestone and plaster, muted blue-grey metalwork, terracotta accent, sheer linen and a discreet unbranded air outlet; density without a recognizable landmark; no people, text, logos, brands, watermarks, exact property or false proof of completed work.",
+    "inspection": "Passed: credible dense coastal context and discreet air distribution; no people, logos, text, brands, watermarks, landmark claims or identifiable address."
+  },
+  {
+    "id": "seasonal-villa-context",
+    "file": "src/assets/seasonal-villa-context.png",
+    "generationReference": "Built-in ImageGen · seasonal-villa-context",
+    "purpose": "Seasonal villa context for Sainte-Maxime, Saint-Tropez and second-home planning",
+    "dimensions": "1536x1024",
+    "generationMode": "Built-in ImageGen",
+    "generatedAt": "2026-07-23",
+    "prompt": "Premium Tempered Riviera editorial photograph: serene unoccupied Mediterranean villa living space opening to a shaded terrace, pine and olive vegetation and distant sea, natural stone, limewash, oak, linen, blue-grey joinery, terracotta ceramic accent and subtle plausible linear diffuser; quiet and believable, no people, text, logos, brands, watermarks, named villa, landmark or false proof of work.",
+    "inspection": "Passed: believable seasonal villa atmosphere and plausible diffuser; no people, logos, text, brands, watermarks, identifiable property or project claim."
+  },
+  {
+    "id": "hospitality-context",
+    "file": "src/assets/hospitality-context.png",
+    "generationReference": "Built-in ImageGen · hospitality-context",
+    "purpose": "Generic guest-facing and professional-space context for services, Cannes and Fréjus",
+    "dimensions": "1536x1024",
+    "generationMode": "Built-in ImageGen",
+    "generatedAt": "2026-07-23",
+    "prompt": "Premium Tempered Riviera editorial photograph: unoccupied refined boutique hospitality lounge on the Mediterranean coast, stone, lime plaster, timber, linen, blue-grey details, terracotta ceramics and discreet physically plausible unbranded linear ceiling diffusers; warm quiet believable setting, no people, staff, menus, signs, text, logos, brands, watermarks, named venue or false client-project implication.",
+    "inspection": "Passed: coherent hospitality composition and plausible integrated air distribution; no people, logos, text, brands, watermarks, named venue or client evidence."
+  },
+  {
+    "id": "coastal-corridor-relief",
+    "file": "src/assets/coastal-corridor-relief.png",
+    "generationReference": "Built-in ImageGen · coastal-corridor-relief",
+    "purpose": "Abstract service-area visual for the Monaco-to-Saint-Tropez corridor hub",
+    "dimensions": "1536x1024",
+    "generationMode": "Built-in ImageGen",
+    "generatedAt": "2026-07-23",
+    "prompt": "Premium Tempered Riviera abstract editorial relief suggesting coastline, hills, airflow and thermal contours through hand-cut paper, plaster, thin lines, translucent blue-grey bands and restrained terracotta markers in the exact Concept B palette; generous pale negative space; not a literal map; no labels, roads, borders, text, logos, brands, watermarks, landmarks or service-boundary claim.",
+    "inspection": "Passed: tactile abstract corridor composition with no literal boundary claim; no people, map labels, logos, text, brands or watermarks."
+  }
+]
